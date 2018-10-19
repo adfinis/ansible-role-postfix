@@ -3,6 +3,7 @@
 dependencies: []
 
 galaxy_info:
+  role_name: postfix
   author: 'Adfinis SyGroup AG'
   description: 'Install and manage postfix'
   company: 'Adfinis SyGroup AG'
