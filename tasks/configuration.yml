@@ -46,16 +46,16 @@
   notify:
     - 'postfix reload aliases'
 
-
-- stat:
+- name: stat postfix virtual alias file
+  stat:
     path: "{{ postfix_virtual_aliases_file }}"
-  register: st
 
-- name: Create file for virtual aliases
-  file: 
+- name: create file for virtual aliases
+  file:
     path: "{{ postfix_virtual_aliases_file }}"
     state: touch
-  when: st.stat.exists == False
+    modification_time: preserve
+    access_time: preserve
 
 - name: configure virtual aliases
   lineinfile:
