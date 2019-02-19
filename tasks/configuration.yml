@@ -46,10 +46,6 @@
   notify:
     - 'postfix reload aliases'
 
-- name: stat postfix virtual alias file
-  stat:
-    path: "{{ postfix_virtual_aliases_file }}"
-
 - name: create file for virtual aliases
   file:
     path: "{{ postfix_virtual_aliases_file }}"
