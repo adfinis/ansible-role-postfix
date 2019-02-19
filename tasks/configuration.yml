@@ -45,3 +45,21 @@
   with_items: '{{ postfix_aliases }}'
   notify:
     - 'postfix reload aliases'
+
+
+- name: Create file for virtual aliases
+  command: touch {{ postfix_virtual_aliases_file }}
+  args:
+    creates: "{{ postfix_virtual_aliases_file }}"
+
+- name: configure virtual aliases
+  lineinfile:
+    name: '{{ postfix_virtual_aliases_file }}'
+    regexp: '^{{ item.name }}:'
+    line: '{{ item.name }} {{ item.alias }}'
+  tags:
+    - 'role::postfix'
+    - 'role::postfix:config'
+  with_items: '{{ postfix_virtual_aliases }}'
+  notify:
+    - 'postfix reload virtual aliases'
