@@ -107,3 +107,19 @@ postfix_aliases: []
 #   postfix_aliases:
 #     - name: root
 #       alias: root@example.com
+
+
+postfix_virtual_aliases: []
+
+# A possible alias list can look like this:
+#
+# .. code-block:: YAML
+#
+# postfix_virtual_alias_maps: hash:/etc/postfix/virtual
+# postfix_virtual_alias_domains: example.com
+#
+# postfix_virtual_aliases:
+#   - name: root
+#     alias: foobar@example.com
+#   - name: test
+#     alias: sysop@example.com

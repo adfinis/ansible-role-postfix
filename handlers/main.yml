@@ -20,3 +20,7 @@
 
 - name: postfix reload aliases
   command: '{{ postfix_postalias }} {{ postfix_aliases_file }}'
+
+- name: postfix reload virtual aliases
+  command: '{{ postfix_postmap }} {{ postfix_virtual_aliases_file }}'
+

@@ -19,5 +19,12 @@ postfix_cfg_dir: /etc/postfix
 # postalias binary
 postfix_postalias: /usr/bin/postalias
 
+# postmap binary
+postfix_postmap: /usr/bin/postmap
+
 # aliases file
 postfix_aliases_file: /etc/postfix/aliases
+
+# virtual aliases file
+postfix_virtual_aliases_file: /etc/postfix/virtual
+postfix_virtual_alias_maps: "hash:{{postfix_virtual_aliases_file}}"

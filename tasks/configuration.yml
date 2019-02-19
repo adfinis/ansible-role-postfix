@@ -45,3 +45,24 @@
   with_items: '{{ postfix_aliases }}'
   notify:
     - 'postfix reload aliases'
+
+- name: create file for virtual aliases
+  file:
+    path: "{{ postfix_virtual_aliases_file }}"
+    state: touch
+    modification_time: preserve
+    access_time: preserve
+  when: postfix_virtual_aliases is defined and (postfix_virtual_aliases|length>0)
+
+- name: configure virtual aliases
+  lineinfile:
+    name: '{{ postfix_virtual_aliases_file }}'
+    regexp: '^{{ item.name }}'
+    line: '{{ item.name }} {{ item.alias }}'
+  tags:
+    - 'role::postfix'
+    - 'role::postfix:config'
+  with_items: '{{ postfix_virtual_aliases }}'
+  when: postfix_virtual_aliases is defined and (postfix_virtual_aliases|length>0)
+  notify:
+    - 'postfix reload virtual aliases'
