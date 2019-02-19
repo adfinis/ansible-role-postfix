@@ -47,15 +47,20 @@
     - 'postfix reload aliases'
 
 
+- stat:
+    path: "{{ postfix_virtual_aliases_file }}"
+  register: st
+
 - name: Create file for virtual aliases
-  command: touch {{ postfix_virtual_aliases_file }}
-  args:
-    creates: "{{ postfix_virtual_aliases_file }}"
+  file: 
+    path: "{{ postfix_virtual_aliases_file }}"
+    state: touch
+  when: st.stat.exists == False
 
 - name: configure virtual aliases
   lineinfile:
     name: '{{ postfix_virtual_aliases_file }}'
-    regexp: '^{{ item.name }}:'
+    regexp: '^{{ item.name }}'
     line: '{{ item.name }} {{ item.alias }}'
   tags:
     - 'role::postfix'
