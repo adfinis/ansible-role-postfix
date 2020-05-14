@@ -1,5 +1,9 @@
 ---
 
+#
+# Settings for main.cf
+#
+
 # postfix role.
 # Default: root
 postfix_role: root
@@ -134,3 +138,43 @@ postfix_virtual_aliases: []
 #     alias: sysop@example.com
 
 postfix_helo_required: "yes"
+
+#
+# Settings for master.cf
+#
+
+# Define if services in main.cf should run in chroot
+# default is false
+postfix_smtp_chroot: False
+
+# activate submisson service
+# default is false
+postfix_submisson: False
+
+# activate smtps service
+# default is false
+postfix_smtps: False
+
+# activate ifmail service
+# default is false
+postfix_ifmail: False
+
+# activate bsmtp service
+# default is false
+postfix_bsmtp: False
+
+# activate scalemail-backend service
+# default is false
+postfix_scalemail_backend: False
+
+# activate mailman service
+# default is false
+postfix_mailman: False
+
+# activate cyrus service
+# default is false
+postfix_cyrus: False
+
+# activate amavis-lmtp service
+# default is false
+postfix_amavis_lmtp: False
