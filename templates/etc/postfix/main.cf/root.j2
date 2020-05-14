@@ -6,7 +6,6 @@ biff                            = no
 append_dot_mydomain             = no
 delay_warning_time              = 4h
 enable_long_queue_ids           = yes
-
 {% if postfix_debug_peer | d(False) %}
 # Peer debugging
 debug_peer_level                = {{ postfix_debug_peer_level }}
@@ -40,19 +39,15 @@ unknown_local_recipient_reject_code = {{ postfix_unknown_local_recipient_reject_
 virtual_alias_maps              = {{ postfix_virtual_alias_maps | join(", ") }}
 virtual_alias_domains           = {{ postfix_virtual_alias_domains }}
 {% endif %}
-
 {% if postfix_virtual_domains | d(False) %}
 virtual_mailbox_domains         = {{ postfix_virtual_domains }}
 {% endif %}
-
 {% if postfix_virtual_mailbox_maps | d(False) %}
 virtual_mailbox_maps            = {{ postfix_virtual_mailbox_maps }}
 {% endif %}
-
 {% if postfix_virtual_transport | d(False) %}
 virtual_transport               = {{ postfix_virtual_transport }}
 {% endif %}
-
 {% if postfix_reply_filter | d(False) %}
 smtp_reply_filter               = {{ postfix_reply_filter }}
 {% endif %}
