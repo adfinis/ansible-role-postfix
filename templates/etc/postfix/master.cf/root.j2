@@ -10,11 +10,26 @@
 # service type  private unpriv  chroot  wakeup  maxproc command + args
 #               (yes)   (yes)   (yes)   (never) (100)
 # ==========================================================================
-smtp      inet  n       -       -       -       -       smtpd
+smtp      inet  n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       smtpd
 #smtp      inet  n       -       -       -       1       postscreen
 #smtpd     pass  -       -       -       -       -       smtpd
 #dnsblog   unix  -       -       -       -       0       dnsblog
 #tlsproxy  unix  -       -       -       -       0       tlsproxy
+{% if postfix_submisson | d(False) %}
+submission inet n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_tls_security_level=encrypt
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_reject_unlisted_recipient=no
+  -o smtpd_client_restrictions=$mua_client_restrictions
+  -o smtpd_helo_restrictions=$mua_helo_restrictions
+  -o smtpd_sender_restrictions=$mua_sender_restrictions
+  -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+  -o milter_macro_daemon_name=ORIGINATING
+  -o smtpd_sasl_type=dovecot
+  -o smtpd_sasl_path=private/auth
+{% else %}
 #submission inet n       -       -       -       -       smtpd
 #  -o syslog_name=postfix/submission
 #  -o smtpd_tls_security_level=encrypt
@@ -28,6 +43,20 @@ smtp      inet  n       -       -       -       -       smtpd
 #  -o milter_macro_daemon_name=ORIGINATING
 #  -o smtpd_sasl_type=dovecot
 #  -o smtpd_sasl_path=private/auth
+{% endif %}
+{% if postfix_smtps | d(False) %}
+smtps     inet  n       -        {{ postfix_smtp_chroot | ternary('y', 'n') }}      -       -       smtpd
+  -o syslog_name=postfix/smtps
+  -o smtpd_tls_wrappermode=yes
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_reject_unlisted_recipient=no
+  -o smtpd_client_restrictions=$mua_client_restrictions
+  -o smtpd_helo_restrictions=$mua_helo_restrictions
+  -o smtpd_sender_restrictions=$mua_sender_restrictions
+  -o smtpd_recipient_restrictions=
+  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+  -o milter_macro_daemon_name=ORIGINATING
+{% else %}
 #smtps     inet  n       -       -       -       -       smtpd
 #  -o syslog_name=postfix/smtps
 #  -o smtpd_tls_wrappermode=yes
@@ -39,32 +68,34 @@ smtp      inet  n       -       -       -       -       smtpd
 #  -o smtpd_recipient_restrictions=
 #  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
 #  -o milter_macro_daemon_name=ORIGINATING
+{% endif %}
 #628       inet  n       -       -       -       -       qmqpd
-pickup    unix  n       -       -       60      1       pickup
-cleanup   unix  n       -       -       -       0       cleanup
+pickup    unix  n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       60      1       pickup
+cleanup   unix  n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       0       cleanup
 qmgr      unix  n       -       n       300     1       qmgr
 #qmgr     unix  n       -       n       300     1       oqmgr
-tlsmgr    unix  -       -       -       1000?   1       tlsmgr
-rewrite   unix  -       -       -       -       -       trivial-rewrite
-bounce    unix  -       -       -       -       0       bounce
-defer     unix  -       -       -       -       0       bounce
-trace     unix  -       -       -       -       0       bounce
-verify    unix  -       -       -       -       1       verify
-flush     unix  n       -       -       1000?   0       flush
+tlsmgr    unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       1000?   1       tlsmgr
+rewrite   unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       trivial-rewrite
+bounce    unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       0       bounce
+defer     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       0       bounce
+trace     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       0       bounce
+verify    unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       1       verify
+flush     unix  n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       1000?   0       flush
 proxymap  unix  -       -       n       -       -       proxymap
 proxywrite unix -       -       n       -       1       proxymap
-smtp      unix  -       -       -       -       -       smtp
-relay     unix  -       -       -       -       -       smtp
+# When relaying mail as backup MX, disable fallback_relay to avoid MX loops
+smtp      unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       smtp
+relay     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       smtp
 #       -o smtp_helo_timeout=5 -o smtp_connect_timeout=5
-showq     unix  n       -       -       -       -       showq
-error     unix  -       -       -       -       -       error
-retry     unix  -       -       -       -       -       error
-discard   unix  -       -       -       -       -       discard
+showq     unix  n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       showq
+error     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       error
+retry     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       error
+discard   unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       discard
 local     unix  -       n       n       -       -       local
 virtual   unix  -       n       n       -       -       virtual
-lmtp      unix  -       -       -       -       -       lmtp
-anvil     unix  -       -       -       -       1       anvil
-scache    unix  -       -       -       -       1       scache
+lmtp      unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       lmtp
+anvil     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       1       anvil
+scache    unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       1       scache
 #
 # ====================================================================
 # Interfaces to non-Postfix software. Be sure to examine the manual
@@ -82,3 +113,43 @@ maildrop  unix  -       n       n       -       -       pipe
   flags=DRhu user=vmail argv=/usr/bin/maildrop -d ${recipient}
 uucp      unix  -       n       n       -       -       pipe
   flags=Fqhu user=uucp argv=uux -r -n -z -a$sender - $nexthop!rmail ($recipient)
+{% if postfix_ifmail | d(False) %}
+ifmail    unix  -       n       n       -       -       pipe
+  flags=F user=ftn argv=/usr/lib/ifmail/ifmail -r $nexthop ($recipient)
+{% endif %}
+{% if postfix_bsmtp | d(False) %}
+bsmtp     unix  -       n       n       -       -       pipe
+  flags=Fq. user=bsmtp argv=/usr/lib/bsmtp/bsmtp -t$nexthop -f$sender $recipient
+{% endif %}
+{% if postfix_scalemail_backend | d(False) %}
+scalemail-backend unix  -       n       n       -       2       pipe
+  flags=R user=scalemail argv=/usr/lib/scalemail/bin/scalemail-store ${nexthop} ${user} ${extension}
+{% endif %}
+{% if postfix_mailman | d(False) %}
+mailman   unix  -       n       n       -       -       pipe
+  flags=FR user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py
+  ${nexthop} ${user}
+{% endif %}
+{% if postfix_cyrus | d(False) %}
+cyrus     unix  -       n       n       -       -       pipe
+  user=cyrus argv=/cyrus/bin/deliver -e -r ${sender} -m ${extension} ${user}
+{% endif %}
+
+{% if postfix_amavis_lmtp | d(False) %}
+# * 
+lmtp-amavis     unix    -       -       n       -       2       lmtp
+     -o lmtp_data_done_timeout=1200
+     -o lmtp_send_xforward_command=yes
+     -o disable_dns_lookups=yes
+     -o max_use=20
+
+127.0.0.1:10025 inet n  -       n       -       10      smtpd
+   -o content_filter=
+   -o receive_override_options=no_unknown_recipient_checks,no_header_body_checks,no_milters
+   -o smtpd_helo_restrictions=
+   -o smtpd_client_restrictions=
+   -o smtpd_sender_restrictions=
+   -o smtpd_recipient_restrictions=permit_mynetworks,reject
+   -o mynetworks=127.0.0.0/8
+   -o smtpd_authorized_xforward_hosts=127.0.0.0/8
+{% endif %}
