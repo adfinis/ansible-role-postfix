@@ -96,8 +96,8 @@ smtp_tls_exclude_ciphers        = aNULL, DES, 3DES, MD5, DES+MD5, RC4
 smtp_tls_protocols              = {{ postfix_ssl_protocols | join(', ') }}
 smtp_tls_CApath                 = {{ pki_directory }}
 
-# SASL parameters
 {% if postfix_sasl %}
+# SASL parameters
 smtpd_sasl_auth_enable          = {{ postfix_sasl_auth_enable }}
 smtpd_sasl_security_options     = {{ postfix_sasl_security_options }}
 smtpd_sasl_tls_security_options = {{ postfix_sasl_tls_security_options}}
@@ -107,8 +107,8 @@ broken_sasl_auth_clients        = {{ postfix_broken_sasl_auth_clients }}
 unknown_local_recipient_reject_code = {{ postfix_unknown_local_recipient_reject_code }}
 {% endif %}
 
-# OpenDKIM
 {% if postfix_opendkim %}
+# OpenDKIM
 milter_protocol = {{ opendkim_milter_protocol }}
 milter_default_action = {{ opendkim_milter_default_action }}
 smtpd_milters = {{ opendkim_smtpd_milters }}
