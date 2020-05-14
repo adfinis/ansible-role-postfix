@@ -35,6 +35,10 @@ mynetworks_style                = {{ postfix_mynetworks_style }}
 
 unknown_local_recipient_reject_code = {{ postfix_unknown_local_recipient_reject_code }}
 
+{% if postfix_always_bcc | d(False) %}
+always_bcc                      = {{ postfix_always_bcc | join(", ") }}
+{% endif %}
+
 {% if postfix_virtual_alias_maps | d(False) and postfix_virtual_alias_domains | d(False) %}
 virtual_alias_maps              = {{ postfix_virtual_alias_maps | join(", ") }}
 virtual_alias_domains           = {{ postfix_virtual_alias_domains }}
@@ -79,8 +83,9 @@ smtpd_tls_session_cache_timeout = {{ postfix_tls_session_cache_timeout }}
 {% if postfix_tls_loglevel | d(False) %}
 smtpd_tls_loglevel              = {{ postfix_tls_loglevel }}
 {% endif %}
-
-smtpd_tls_ask_ccert             = {{ postfix_tls_ask_ccert | d(postfix) }}
+{% if postfix_tls_ask_ccert | d(False) %}
+smtpd_tls_ask_ccert             = {{ postfix_tls_ask_ccert }}
+{% endif %}
 smtpd_tls_ciphers               = medium
 smtpd_tls_exclude_ciphers       = aNULL, DES, 3DES, MD5, DES+MD5, RC4
 smtpd_tls_protocols             = {{ postfix_ssl_protocols | join(', ') }}
@@ -96,7 +101,7 @@ smtp_tls_exclude_ciphers        = aNULL, DES, 3DES, MD5, DES+MD5, RC4
 smtp_tls_protocols              = {{ postfix_ssl_protocols | join(', ') }}
 smtp_tls_CApath                 = {{ pki_directory }}
 
-{% if postfix_sasl %}
+{% if postfix_sasl | d(False) %}
 # SASL parameters
 smtpd_sasl_auth_enable          = {{ postfix_sasl_auth_enable }}
 smtpd_sasl_security_options     = {{ postfix_sasl_security_options }}
@@ -107,7 +112,7 @@ broken_sasl_auth_clients        = {{ postfix_broken_sasl_auth_clients }}
 unknown_local_recipient_reject_code = {{ postfix_unknown_local_recipient_reject_code }}
 {% endif %}
 
-{% if postfix_opendkim %}
+{% if postfix_opendkim | d(False) %}
 # OpenDKIM
 milter_protocol = {{ opendkim_milter_protocol }}
 milter_default_action = {{ opendkim_milter_default_action }}
