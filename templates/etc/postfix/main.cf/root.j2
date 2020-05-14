@@ -6,7 +6,12 @@ biff                            = no
 append_dot_mydomain             = no
 delay_warning_time              = 4h
 enable_long_queue_ids           = yes
-debug_peer_level                = 1
+
+{% if postfix_debug_peer | d(False) %}
+# Peer debugging
+debug_peer_level                = {{ postfix_debug_peer_level }}
+debug_peer_list                 = {{ postfix_debug_peer_list | join(", ") }}
+{% endif %}
 
 myhostname                      = {{ postfix_myhostname }}
 mydomain                        = {{ postfix_mydomain }}
