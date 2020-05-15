@@ -10,13 +10,13 @@
 # service type  private unpriv  chroot  wakeup  maxproc command + args
 #               (yes)   (yes)   (yes)   (never) (100)
 # ==========================================================================
-smtp      inet  n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       smtpd
+smtp      inet  n       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       smtpd
 #smtp      inet  n       -       -       -       1       postscreen
 #smtpd     pass  -       -       -       -       -       smtpd
 #dnsblog   unix  -       -       -       -       0       dnsblog
 #tlsproxy  unix  -       -       -       -       0       tlsproxy
 {% if postfix_submisson | d(False) %}
-submission inet n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       smtpd
+submission inet n       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       smtpd
   -o syslog_name=postfix/submission
   -o smtpd_tls_security_level=encrypt
   -o smtpd_sasl_auth_enable=yes
@@ -45,7 +45,7 @@ submission inet n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}   
 #  -o smtpd_sasl_path=private/auth
 {% endif %}
 {% if postfix_smtps | d(False) %}
-smtps     inet  n       -        {{ postfix_smtp_chroot | ternary('y', 'n') }}      -       -       smtpd
+smtps     inet  n       -        {{ postfix_smtp_chroot | ternary('y', '-') }}      -       -       smtpd
   -o syslog_name=postfix/smtps
   -o smtpd_tls_wrappermode=yes
   -o smtpd_sasl_auth_enable=yes
@@ -70,32 +70,32 @@ smtps     inet  n       -        {{ postfix_smtp_chroot | ternary('y', 'n') }}  
 #  -o milter_macro_daemon_name=ORIGINATING
 {% endif %}
 #628       inet  n       -       -       -       -       qmqpd
-pickup    unix  n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       60      1       pickup
-cleanup   unix  n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       0       cleanup
+pickup    unix  n       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       60      1       pickup
+cleanup   unix  n       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       0       cleanup
 qmgr      unix  n       -       n       300     1       qmgr
 #qmgr     unix  n       -       n       300     1       oqmgr
-tlsmgr    unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       1000?   1       tlsmgr
-rewrite   unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       trivial-rewrite
-bounce    unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       0       bounce
-defer     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       0       bounce
-trace     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       0       bounce
-verify    unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       1       verify
-flush     unix  n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       1000?   0       flush
+tlsmgr    unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       1000?   1       tlsmgr
+rewrite   unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       trivial-rewrite
+bounce    unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       0       bounce
+defer     unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       0       bounce
+trace     unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       0       bounce
+verify    unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       1       verify
+flush     unix  n       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       1000?   0       flush
 proxymap  unix  -       -       n       -       -       proxymap
 proxywrite unix -       -       n       -       1       proxymap
 # When relaying mail as backup MX, disable fallback_relay to avoid MX loops
-smtp      unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       smtp
-relay     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       smtp
+smtp      unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       smtp
+relay     unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       smtp
 #       -o smtp_helo_timeout=5 -o smtp_connect_timeout=5
-showq     unix  n       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       showq
-error     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       error
-retry     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       error
-discard   unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       discard
+showq     unix  n       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       showq
+error     unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       error
+retry     unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       error
+discard   unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       discard
 local     unix  -       n       n       -       -       local
 virtual   unix  -       n       n       -       -       virtual
-lmtp      unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       -       lmtp
-anvil     unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       1       anvil
-scache    unix  -       -       {{ postfix_smtp_chroot | ternary('y', 'n') }}       -       1       scache
+lmtp      unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       lmtp
+anvil     unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       1       anvil
+scache    unix  -       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       1       scache
 #
 # ====================================================================
 # Interfaces to non-Postfix software. Be sure to examine the manual
