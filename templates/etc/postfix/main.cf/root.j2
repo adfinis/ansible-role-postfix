@@ -67,9 +67,7 @@ smtpd_use_tls                   = {{ postfix_use_tls }}
 smtpd_tls_cert_file             = {{ postfix_tls_cert_file | d(pki_snakeoil.cert) }}
 smtpd_tls_key_file              = {{ postfix_tls_key_file | d(pki_snakeoil.pkey) }}
 smtpd_tls_auth_only             = yes
-{% if postfix_tls_received_header | d(False) %}
-smtpd_tls_received_header       = {{ postfix_tls_received_header }}
-{% endif %}
+smtpd_tls_received_header       = yes
 smtpd_tls_security_level        = may
 {% if postfix_starttls_timeout | d(False) %}
 smtpd_starttls_timeout          = {{ postfix_starttls_timeout }}
