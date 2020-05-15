@@ -6,11 +6,17 @@ biff                            = no
 append_dot_mydomain             = no
 delay_warning_time              = 4h
 enable_long_queue_ids           = yes
+{% if postfix_debug_peer | d(False) %}
+# Peer debugging
+debug_peer_level                = {{ postfix_debug_peer_level }}
+debug_peer_list                 = {{ postfix_debug_peer_list | join(", ") }}
+{% endif %}
 
 myhostname                      = {{ postfix_myhostname }}
 mydomain                        = {{ postfix_mydomain }}
 myorigin                        = {{ postfix_myorigin }}
 smtp_helo_name                  = {{ postfix_myorigin }}
+smtpd_helo_required             = {{ postfix_helo_required }}
 
 alias_maps                      = hash:/etc/aliases
 alias_database                  = hash:/etc/aliases
@@ -28,10 +34,26 @@ mynetworks_style                = {{ postfix_mynetworks_style }}
 {% endif %}
 
 unknown_local_recipient_reject_code = {{ postfix_unknown_local_recipient_reject_code }}
-{% if postfix_virtual_alias_maps | d(False) and postfix_virtual_alias_domains | d(False) %}
 
-virtual_alias_maps              = {{ postfix_virtual_alias_maps }}
+{% if postfix_always_bcc | d(False) %}
+always_bcc                      = {{ postfix_always_bcc | join(", ") }}
+{% endif %}
+
+{% if postfix_virtual_alias_maps | d(False) and postfix_virtual_alias_domains | d(False) %}
+virtual_alias_maps              = {{ postfix_virtual_alias_maps | join(", ") }}
 virtual_alias_domains           = {{ postfix_virtual_alias_domains }}
+{% endif %}
+{% if postfix_virtual_domains | d(False) %}
+virtual_mailbox_domains         = {{ postfix_virtual_domains }}
+{% endif %}
+{% if postfix_virtual_mailbox_maps | d(False) %}
+virtual_mailbox_maps            = {{ postfix_virtual_mailbox_maps }}
+{% endif %}
+{% if postfix_virtual_transport | d(False) %}
+virtual_transport               = {{ postfix_virtual_transport }}
+{% endif %}
+{% if postfix_reply_filter | d(False) %}
+smtp_reply_filter               = {{ postfix_reply_filter }}
 {% endif %}
 
 # TLS parameters
@@ -39,14 +61,33 @@ tls_high_cipherlist             = !aNULL:ALL:!EXPORT:!LOW:!MEDIUM:!DES:!3DES:!MD
 tls_medium_cipherlist           = !aNULL:ALL:!EXPORT:!LOW:!DES:!3DES:!MD5:!RC4:@STRENGTH
 tls_low_cipherlist              = !aNULL:ALL:!EXPORT:!DES:!3DES:!MD5:!RC4:@STRENGTH
 
+{% if postfix_use_tls | d(False) %}
+smtpd_use_tls                   = {{ postfix_use_tls }}
+{% endif %}
 smtpd_tls_cert_file             = {{ postfix_tls_cert_file | d(pki_snakeoil.cert) }}
 smtpd_tls_key_file              = {{ postfix_tls_key_file | d(pki_snakeoil.pkey) }}
 smtpd_tls_auth_only             = yes
 smtpd_tls_received_header       = yes
 smtpd_tls_security_level        = may
+{% if postfix_starttls_timeout | d(False) %}
+smtpd_starttls_timeout          = {{ postfix_starttls_timeout }}
+{% endif %}
+{% if postfix_smtpd_timeout | d(False) %}
+smtpd_timeout                   = {{ postfix_smtpd_timeout }}
+{% endif %}
+{% if postfix_tls_session_cache_timeout | d(False) %}
+smtpd_tls_session_cache_timeout = {{ postfix_tls_session_cache_timeout }}
+{% endif %}
+{% if postfix_tls_loglevel | d(False) %}
+smtpd_tls_loglevel              = {{ postfix_tls_loglevel }}
+{% endif %}
+{% if postfix_tls_ask_ccert | d(False) %}
+smtpd_tls_ask_ccert             = {{ postfix_tls_ask_ccert }}
+{% endif %}
 smtpd_tls_ciphers               = medium
 smtpd_tls_exclude_ciphers       = aNULL, DES, 3DES, MD5, DES+MD5, RC4
 smtpd_tls_protocols             = {{ postfix_ssl_protocols | join(', ') }}
+smtpd_tls_mandatory_protocols   = {{ postfix_tls_mandatory_protocols | join(', ') }}
 
 smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
@@ -57,6 +98,25 @@ smtp_tls_ciphers                = high
 smtp_tls_exclude_ciphers        = aNULL, DES, 3DES, MD5, DES+MD5, RC4
 smtp_tls_protocols              = {{ postfix_ssl_protocols | join(', ') }}
 smtp_tls_CApath                 = {{ pki_directory }}
+
+{% if postfix_sasl | d(False) %}
+# SASL parameters
+smtpd_sasl_auth_enable          = {{ postfix_sasl_auth_enable }}
+smtpd_sasl_security_options     = {{ postfix_sasl_security_options }}
+smtpd_sasl_tls_security_options = {{ postfix_sasl_tls_security_options}}
+smtpd_sasl_local_domain         = {{ postfix_sasl_local_domain }}
+smtpd_sasl_authenticated_header = {{ postfix_sasl_authenticated_header }}
+broken_sasl_auth_clients        = {{ postfix_broken_sasl_auth_clients }}
+unknown_local_recipient_reject_code = {{ postfix_unknown_local_recipient_reject_code }}
+{% endif %}
+
+{% if postfix_opendkim | d(False) %}
+# OpenDKIM
+milter_protocol = {{ opendkim_milter_protocol }}
+milter_default_action = {{ opendkim_milter_default_action }}
+smtpd_milters = {{ opendkim_smtpd_milters }}
+non_smtpd_milters = {{ opendkim_non_smtpd_milters }}
+{% endif %}
 
 # postscreen configuration (http://rob0.nodns4.us/postscreen.html)
 #postscreen_blacklist_action     = drop

@@ -1,5 +1,9 @@
 ---
 
+#
+# Settings for main.cf
+#
+
 # postfix role.
 # Default: root
 postfix_role: root
@@ -96,6 +100,41 @@ postfix_ssl_protocols:
   - '!SSLv2'
   - '!SSLv3'
 
+postfix_tls_mandatory_protocols:
+  - TLSv1
+  - TLSv1.1
+  - TLSv1.2
+  - '!SSLv2'
+  - '!SSLv3'
+  
+postfix_tls_loglevel: 0
+
+# Activate peer debugging
+# default is false
+postfix_debug_peer: False
+
+# Define the increment in verbose logging level when a remote client or 
+# server matches a pattern in the debug_peer_list parameter.
+# default is 1
+postfix_debug_peer_level: 1
+
+# Define Optional list of remote client or server hostname or network
+# address patterns that cause the verbose logging level to increase by the 
+# amount specified in $debug_peer_level.
+# Specify domain names, network/netmask patterns, "/file/name" patterns
+# or "type:table" lookup tables. The right-hand side result from "type:table" 
+# lookups is ignored.
+postfix_debug_peer_list: []
+
+# A possible peer debugging list can look like this:
+#
+# .. code-block:: YAML
+#
+#   postfix_debug_peer_list:
+#     - "127.0.0.1"
+#     - "example.com"
+
+
 # Define a list of aliases, they will be written to the ``/etc/aliases`` file.
 # Default is an empty list.
 postfix_aliases: []
@@ -123,3 +162,45 @@ postfix_virtual_aliases: []
 #     alias: foobar@example.com
 #   - name: test
 #     alias: sysop@example.com
+
+postfix_helo_required: "yes"
+
+#
+# Settings for master.cf
+#
+
+# Define if services in main.cf should run in chroot
+# default is false
+postfix_smtp_chroot: False
+
+# activate submisson service
+# default is false
+postfix_submisson: False
+
+# activate smtps service
+# default is false
+postfix_smtps: False
+
+# activate ifmail service
+# default is false
+postfix_ifmail: False
+
+# activate bsmtp service
+# default is false
+postfix_bsmtp: False
+
+# activate scalemail-backend service
+# default is false
+postfix_scalemail_backend: False
+
+# activate mailman service
+# default is false
+postfix_mailman: False
+
+# activate cyrus service
+# default is false
+postfix_cyrus: False
+
+# activate amavis-lmtp service
+# default is false
+postfix_amavis_lmtp: False
