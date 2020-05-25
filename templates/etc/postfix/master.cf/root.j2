@@ -17,6 +17,10 @@ smtp      inet  n       -       {{ postfix_smtp_chroot | ternary('y', '-') }}   
 #tlsproxy  unix  -       -       -       -       0       tlsproxy
 {% if postfix_submisson | d(False) %}
 submission inet n       -       {{ postfix_smtp_chroot | ternary('y', '-') }}       -       -       smtpd
+{% else %}
+#submission inet n       -       -       -       -       smtpd
+{% endif %}
+{% if postfix_submisson | d(False) and postfix_submisson_options | d(False) %}
   -o syslog_name=postfix/submission
   -o smtpd_tls_security_level=encrypt
   -o smtpd_sasl_auth_enable=yes
@@ -30,7 +34,6 @@ submission inet n       -       {{ postfix_smtp_chroot | ternary('y', '-') }}   
   -o smtpd_sasl_type=dovecot
   -o smtpd_sasl_path=private/auth
 {% else %}
-#submission inet n       -       -       -       -       smtpd
 #  -o syslog_name=postfix/submission
 #  -o smtpd_tls_security_level=encrypt
 #  -o smtpd_sasl_auth_enable=yes
@@ -46,6 +49,10 @@ submission inet n       -       {{ postfix_smtp_chroot | ternary('y', '-') }}   
 {% endif %}
 {% if postfix_smtps | d(False) %}
 smtps     inet  n       -        {{ postfix_smtp_chroot | ternary('y', '-') }}      -       -       smtpd
+{% else %}
+#smtps     inet  n       -       -       -       -       smtpd
+{% endif %}
+{% if postfix_smtps | d(False) and postfix_smtps_options | d(False) %}
   -o syslog_name=postfix/smtps
   -o smtpd_tls_wrappermode=yes
   -o smtpd_sasl_auth_enable=yes
@@ -57,7 +64,6 @@ smtps     inet  n       -        {{ postfix_smtp_chroot | ternary('y', '-') }}  
   -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
   -o milter_macro_daemon_name=ORIGINATING
 {% else %}
-#smtps     inet  n       -       -       -       -       smtpd
 #  -o syslog_name=postfix/smtps
 #  -o smtpd_tls_wrappermode=yes
 #  -o smtpd_sasl_auth_enable=yes
