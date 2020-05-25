@@ -24,7 +24,3 @@ postfix_postmap: /usr/sbin/postmap
 
 # aliases file
 postfix_aliases_file: /etc/aliases
-
-# virtual aliases file
-postfix_virtual_aliases_file: /etc/postfix/virtual
-postfix_virtual_alias_maps: "hash:{{postfix_virtual_aliases_file}}"
