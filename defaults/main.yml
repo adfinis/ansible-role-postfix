@@ -79,14 +79,28 @@ postfix_unknown_local_recipient_reject_code: 550
 # local or remote address. The table format and lookups are documented in
 # virtual(5). For an overview of Postfix address manipulations see the
 # ADDRESS_REWRITING_README document.
-postfix_virtual_alias_maps: ''
+postfix_virtual_alias_maps: []
+# A possible alias list can look like this:
+#
+# .. code-block:: YAML
+#
+# postfix_virtual_alias_maps:
+#  -  "hash:/etc/postfix/virtual"
+#  -  "ldap:/etc/postfix/ldap-aliases.cf"
 
 # Postfix is final destination for the specified list of virtual alias domains,
 # that is, domains for which all addresses are aliased to addresses in other
 # local or remote domains. The SMTP server validates recipient addresses with
 # ``$virtual_alias_maps`` and rejects non-existent recipients. See also the
 # virtual alias domain class in the ADDRESS_CLASS_README file
-postfix_virtual_alias_domains: ''
+postfix_virtual_alias_domains: []
+# A possible alias list can look like this:
+#
+# .. code-block:: YAML
+#
+# postfix_virtual_alias_domains:
+#  - "example.com"
+#  - "company.net"
 
 # List of TLS protocols that the Postfix SMTP client will exclude or include
 # with opportunistic TLS encryption. The default value is ``!SSLv2, !SSLv3``
@@ -106,7 +120,7 @@ postfix_tls_mandatory_protocols:
   - TLSv1.2
   - '!SSLv2'
   - '!SSLv3'
-  
+
 postfix_tls_loglevel: 0
 
 # Activate peer debugging
@@ -146,22 +160,6 @@ postfix_aliases: []
 #   postfix_aliases:
 #     - name: root
 #       alias: root@example.com
-
-
-postfix_virtual_aliases: []
-
-# A possible alias list can look like this:
-#
-# .. code-block:: YAML
-#
-# postfix_virtual_alias_maps: hash:/etc/postfix/virtual
-# postfix_virtual_alias_domains: example.com
-#
-# postfix_virtual_aliases:
-#   - name: root
-#     alias: foobar@example.com
-#   - name: test
-#     alias: sysop@example.com
 
 postfix_helo_required: "yes"
 
