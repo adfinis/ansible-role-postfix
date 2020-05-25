@@ -39,8 +39,7 @@ unknown_local_recipient_reject_code = {{ postfix_unknown_local_recipient_reject_
 always_bcc                      = {{ postfix_always_bcc | join(", ") }}
 {% endif %}
 
-{% if postfix_virtual_alias_maps | d(False) and postfix_virtual_alias_domains | d(False) %}
-virtual_alias_maps              = {{ postfix_virtual_alias_maps | join(", ") }}
+{% if postfix_virtual_alias_domains | d(False) %}
 virtual_alias_domains           = {{ postfix_virtual_alias_domains }}
 {% endif %}
 {% if postfix_virtual_domains | d(False) %}
@@ -49,19 +48,21 @@ virtual_mailbox_domains         = {{ postfix_virtual_domains }}
 {% if postfix_virtual_mailbox_maps | d(False) %}
 virtual_mailbox_maps            = {{ postfix_virtual_mailbox_maps }}
 {% endif %}
+{% if postfix_virtual_alias_maps | d(False) %}
+virtual_alias_maps              = {{ postfix_virtual_alias_maps | join(", ") }}
+{% endif %}
 {% if postfix_virtual_transport | d(False) %}
 virtual_transport               = {{ postfix_virtual_transport }}
 {% endif %}
 {% if postfix_reply_filter | d(False) %}
 smtp_reply_filter               = {{ postfix_reply_filter }}
 {% endif %}
-
+{% if postfix_use_tls | d(False) %}
 # TLS parameters
 tls_high_cipherlist             = !aNULL:ALL:!EXPORT:!LOW:!MEDIUM:!DES:!3DES:!MD5:!RC4:@STRENGTH
 tls_medium_cipherlist           = !aNULL:ALL:!EXPORT:!LOW:!DES:!3DES:!MD5:!RC4:@STRENGTH
 tls_low_cipherlist              = !aNULL:ALL:!EXPORT:!DES:!3DES:!MD5:!RC4:@STRENGTH
 
-{% if postfix_use_tls | d(False) %}
 smtpd_use_tls                   = {{ postfix_use_tls }}
 {% endif %}
 smtpd_tls_cert_file             = {{ postfix_tls_cert_file | d(pki_snakeoil.cert) }}
@@ -141,32 +142,39 @@ non_smtpd_milters = {{ opendkim_non_smtpd_milters }}
 #postscreen_bare_newline_enable  = no
 #postscreen_bare_newline_action  = ignore
 
+{% if postfix_smtpd_client_restrictions | d(True) %}
 smtpd_client_restrictions =
       permit_mynetworks
-
+{% endif %}
+{% if postfix_smtpd_helo_restrictions | d(True) %}
 smtpd_helo_restrictions =
       reject_invalid_helo_hostname,
       reject_unknown_helo_hostname,
       reject_non_fqdn_helo_hostname
-
+{% endif %}
+{% if postfix_smtpd_sender_restrictions | d(True) %}
 smtpd_sender_restrictions =
       reject_unknown_sender_domain,
       reject_non_fqdn_sender
-
+{% endif %}
+{% if postfix_smtpd_relay_restrictions | d(True) %}
 smtpd_relay_restrictions =
       reject_non_fqdn_recipient,
       reject_unknown_recipient_domain,
       permit_mynetworks,
       permit_sasl_authenticated,
       reject_unauth_destination
-
+{% endif %}
+{% if postfix_smtpd_recipient_restrictions | d(True) %}
 smtpd_recipient_restrictions =
       reject_non_fqdn_recipient,
       reject_unknown_recipient_domain,
       permit_mynetworks,
       permit_sasl_authenticated,
-      reject_unauth_destination,
-
+      reject_unauth_destination
+{% endif %}
+{% if postfix_smtpd_data_restrictions | d(True) %}
 smtpd_data_restrictions =
       reject_unauth_pipelining,
       reject_multi_recipient_bounce
+{% endif %}
